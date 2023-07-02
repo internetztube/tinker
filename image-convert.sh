@@ -50,5 +50,13 @@ read -r FOLDER_OUTPUT
 checkFolder $FOLDER_OUTPUT
 
 #               input extension     output suffix       output extension      quality
-convertFolder   "JPG"               "with filter"       "jpeg"                98
-convertFolder   "DNG"               "original"          "jpeg"                98
+convertFolder   "JPG"               "with filter"       "jpeg"                95
+convertFolder   "DNG"               "original"          "jpeg"                95
+
+FOLDER_INPUT_SIZE=`du -sh $FOLDER_INPUT | awk '{print $1}'`
+FOLDER_OUTPUT_SIZE=`du -sh $FOLDER_OUTPUT | awk '{print $1}'`
+
+echo ""
+echo "Size Savings:"
+echo "$FOLDER_INPUT_SIZE -> $FOLDER_OUTPUT_SIZE"
+echo ""
