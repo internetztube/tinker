@@ -30,7 +30,12 @@ function convertFolder() {
     else
         echo "CONVERT              -  $DATE_CREATED  -  $SOURCE -> $DESTINATION"
         (
-          convert "$SOURCE" -quality $CONFIG_QUALITY% "$DESTINATION" &&
+          convert \
+            -auto-orient \
+            -define dng:use-camera-wb=true \
+            -quality $CONFIG_QUALITY% \
+            "$SOURCE" \
+            "$DESTINATION" &&
           SetFile -d "$DATE_CREATED" "$DESTINATION" &&
           SetFile -m "$DATE_CREATED" "$DESTINATION"
         ) &
