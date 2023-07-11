@@ -27,7 +27,7 @@ CLUSTERS=`
     --output json \
     | jq -r ".clusterArns[]"
 `
-if [ -z "$CLUSTERS"]
+if [ -z "$CLUSTERS" ]
 then
   echo ""
   echo "No clusters found! Are you authenticated?"
