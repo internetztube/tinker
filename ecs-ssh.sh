@@ -6,13 +6,13 @@
 DEFAULT_AWS_REGION="eu-central-1"
 DEFAULT_AWS_PROFILE="default"
 
-if [ -z "$AWS_REGION"]
+if [ -z "$AWS_REGION" ]
 then
   echo "Note: No AWS_REGION set.  Defaulting to \"$DEFAULT_AWS_REGION\"."
   AWS_REGION=$DEFAULT_AWS_REGION
 fi
 
-if [ -z "$AWS_PROFILE"]
+if [ -z "$AWS_PROFILE" ]
 then
     echo "Note: No AWS_PROFILE set. Defaulting to \"$DEFAULT_AWS_PROFILE\"."
     AWS_PROFILE=$DEFAULT_AWS_PROFILE
@@ -24,6 +24,7 @@ echo "\nFetching clusters ..."
 CLUSTERS=`
   aws ecs list-clusters \
     --region $AWS_REGION \
+    --profile $AWS_PROFILE \
     --output json \
     | jq -r ".clusterArns[]"
 `
@@ -49,6 +50,7 @@ do
     aws ecs list-services \
       --cluster $cluster \
       --region $AWS_REGION \
+      --profile $AWS_PROFILE \
       --output json \
       | jq -r ".serviceArns[]"
   `
@@ -74,6 +76,7 @@ do
         --cluster $cluster \
         --service-name $service \
         --region $AWS_REGION \
+        --profile $AWS_PROFILE \
         --output json \
         | jq -r ".taskArns[]"
     `
@@ -99,6 +102,7 @@ do
           --tasks $taskArn \
           --cluster $cluster \
           --region $AWS_REGION \
+          --profile $AWS_PROFILE \
           --output json \
           | jq -r ".tasks[0]"
       `
@@ -116,6 +120,7 @@ do
         aws ecs describe-task-definition \
           --task-definition $taskDefinitionArn \
           --region $AWS_REGION \
+          --profile $AWS_PROFILE \
           --output json \
           | jq -r ".taskDefinition.family"
       `
