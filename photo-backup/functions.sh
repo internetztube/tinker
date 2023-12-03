@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-FOLDER_OUTPUT_BASE="/Users/frederic.koeberl/Documents/imports"
-
 set -e
 
 function checkFolder() {
@@ -30,6 +28,7 @@ function convertFolder() {
   OUTPUT_SUFFIX="$2"
   OUTPUT_EXTENSION="$3"
   QUALITY="$4"
+  FOLDER_OUTPUT="$5"
 
   cd "$FOLDER_INPUT"
   for FILE_PATH in *.$INPUT_EXTENSION; do
@@ -57,25 +56,33 @@ function convertFolder() {
         # Remove & to disable parallel processing.
     fi
   done
+  wait $(jobs -p)
 }
 
-echo "Read Input Folder"
-FOLDER_INPUT="$(readFolder "Input Folder")"
-FOLDER_OUTPUT="$FOLDER_OUTPUT_BASE/$(date '+%Y-%m-%d %H-%M-%S')"
-mkdir -p "$FOLDER_OUTPUT"
+function google_photos_check_auth() {
+  CONFIG_PATH="$1"
+  TOKEN_STORE_KEY="$2"
+  set +e
+  TEST=$(GPHOTOS_CLI_TOKENSTORE_KEY="$TOKEN_STORE_KEY" gphotos-uploader-cli list albums --config "$CONFIG_PATH")
+  set -e
 
-#               input extension     output suffix       output extension      quality
-convertFolder   "JPG"               "with filter"       "jpeg"                95
-convertFolder   "DNG"               "original"          "jpeg"                95
+  if [[ "$TEST" == *"Token is valid"* ]]; then
+    echo "Token is valid!"
+  else
+    echo "Token is invalid! Now reauth!"
+    google_photos_auth "$CONFIG_PATH" "$TOKEN_STORE_KEY"
+    google_photos_check_auth "$CONFIG_PATH" "$TOKEN_STORE_KEY"
+  fi
+}
 
-FOLDER_INPUT_SIZE=$(du -sh "$FOLDER_INPUT" | awk '{print $1}')
-FOLDER_OUTPUT_SIZE=$(du -sh "$FOLDER_OUTPUT" | awk '{print $1}')
+function google_photos_auth() {
+  CONFIG_PATH="$1"
+  TOKEN_STORE_KEY="$2"
+  GPHOTOS_CLI_TOKENSTORE_KEY="$TOKEN_STORE_KEY" gphotos-uploader-cli auth --config "$CONFIG_PATH"
+}
 
-echo ""
-echo "Size Savings:"
-echo "$FOLDER_INPUT_SIZE -> $FOLDER_OUTPUT_SIZE"
-echo ""
-
-alert "Image Processing done!" "Size Savings: $FOLDER_INPUT_SIZE -> $FOLDER_OUTPUT_SIZE"
-open "$FOLDER_OUTPUT"
-open "https://photos.google.com"
+function google_photos_upload() {
+  CONFIG_PATH="$1"
+  TOKEN_STORE_KEY="$2"
+  GPHOTOS_CLI_TOKENSTORE_KEY="$TOKEN_STORE_KEY" gphotos-uploader-cli push --config "$CONFIG_PATH"
+}
