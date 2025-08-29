@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-FOLDER_OUTPUT_BASE="/Users/frederic.koeberl/Documents/imports"
+FOLDER_OUTPUT_BASE="/Users/internetztube/Documents/imports"
 
 set -e
 
@@ -57,7 +57,7 @@ function convertFolder() {
             "$DESTINATION" &&
           SetFile -d "$DATE_CREATED" "$DESTINATION" &&
           SetFile -m "$DATE_CREATED" "$DESTINATION"
-        ) &
+        )
         # Remove & to disable parallel processing.
     fi
   done
