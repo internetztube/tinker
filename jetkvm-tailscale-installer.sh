@@ -53,8 +53,7 @@ ${SSH} <<EOF
 case "\$1" in
   start)
     modprobe tun || true
-    TS_DEBUG_FIREWALL_MODE=nftables /userdata/tailscale/tailscaled \
-      -statedir /userdata/tailscale-state &
+    /userdata/tailscale/tailscaled -statedir /userdata/tailscale-state &
     ;;
   stop)
     killall tailscaled || true
@@ -86,6 +85,9 @@ EOF
 echo "=============================================================================="
 echo "To uninstall Tailscale from your JetKVM, run:"
 echo "  ${SSH} \"rm -rf /userdata/tailscale /userdata/tailscale-state /etc/init.d/S22tailscale && reboot\""
+echo "=============================================================================="
+echo "Since JetKVM does not support kernel-level NAT (iptables/nftables), exit node does not support traffic forwarding."
+echo "→ When using JetKVM as a exit node, you have only access to the JetKVM web interface, but no internet/network access!"
 echo "=============================================================================="
 echo ""
 echo "Happy tunneling! 🎉"
